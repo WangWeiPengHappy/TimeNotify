@@ -1,2 +1,4 @@
 # TimeNotify
-A little program to tell your the time to rest or do other things
+Date:2020-08-11
+Authur:Eric
+Description: A little program to tell you the time to rest or do other things
