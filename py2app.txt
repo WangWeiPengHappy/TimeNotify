@@ -1,0 +1,48 @@
+1. How to package py to mac app 
+1、安装py2app，打开终端，执行
+
+pip install py2app
+
+2、在桌面新建一个文件夹，取名xxx，打包的程序baba.py放在里面
+
+3、进入终端，切路径至该文件夹下，执行
+
+py2applet --make-setup baba.py
+
+4、开始打包应用，执行
+
+python setup.py py2app
+
+5、xxx文件下出现dist文件夹，打开后里面有个app，双击即可运行
+
+2.python 总结
+1）Timer 实现
+https://blog.51cto.com/huangyg/2367088
+循环+sleep
+timer
+schedule
+apscheduler
+
+2）GUI
+-->1 tkinter:
+https://docs.python.org/3/library/tkinter.html#tkinter-modules
+layout: place , pack, grid
+https://www.jianshu.com/p/3c30351692d2
+
+控件
+https://cloud.tencent.com/developer/article/1741235
+
+-->2 pyQt
+http://www.byhy.net/tut/py/gui/qt_01/
+
+3）倒计时（countdown)
+4）多线程
+https://www.liaoxuefeng.com/wiki/1016959663602400/1017629247922688
+threading.Thread(target=BackgroundThread)
+
+todo
+1) sql 或 csv
+2) 播放器
+背景音乐
+
+3）云备份
