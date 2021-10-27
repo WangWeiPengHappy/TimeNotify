@@ -17,7 +17,7 @@ g_workTimeSec = g_restTimeSec = 59
 g_btnStart = "start"
 g_btnPause = "pause"
 g_btnStop = "stop"
-g_isStart = True
+g_isStart = False
 def showInfo(title, content):
     messagebox.showinfo(title, content, parent=main)#parent=main for messagebox is topmost
 
