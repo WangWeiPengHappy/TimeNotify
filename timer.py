@@ -64,10 +64,8 @@ def UpdateTime():
     global g_isStart
     lableTime.config(text= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     #print(entryItemContent.get())
-    if False == g_isStart:
-        return
 
-    if(CountDown()):
+    if(g_isStart and CountDown()):
         if(lableCountDownName.cget("text") == g_workString):
             Record(entryItemContent.get(), RecordType.Record_File)
             entryItemContent.config(state="normal")
@@ -115,7 +113,6 @@ def HandleBtnEvent(btnText):
         entryItemContent.config(state="disable")
         BtnStart.config(text=g_btnPause)   
         g_isStart = True
-        UpdateTime()
     elif(btnText == g_btnPause):
         #pause
         g_isStart = False
@@ -178,7 +175,7 @@ lableTime.pack(side=LEFT, anchor="w")
 # framePlaceholderBottom = Frame(main)
 # framePlaceholderBottom.config(height= int(0.25* main.winfo_height()))
 # framePlaceholderBottom.pack(side=BOTTOM, anchor="w")
-#UpdateTime()
+UpdateTime()
 
 
 
