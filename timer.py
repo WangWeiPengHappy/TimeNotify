@@ -138,7 +138,7 @@ def HandleBtnEvent(btnText):
     return
 
 main = tkinter.Tk()
-main.title("ComeOnDebug")
+main.title("ComeOnGuys")
 #set windows on top most
 main.wm_attributes("-topmost", 1) 
 #it will pop windows when click the icon on docker
