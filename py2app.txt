@@ -46,3 +46,7 @@ todo
 背景音乐
 
 3）云备份
+
+Issue
+import timer 会导致tkinter窗口被关掉之后又自动打开一遍，需要close两遍才能关掉
+最小化后，再点击图标无法重新显示窗口

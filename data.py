@@ -22,14 +22,16 @@ def RecordToFile(content):
     if False == os.path.exists(timerFloder):
         os.mkdir(timerFloder)
 
+    with open(recordFilePath, "a") as f:
+        f.write(content)
+        f.write("\r\n")
+
     if(os.path.getsize(recordFilePath) >= g_recordFileMaxSize):
         tempFileName = os.path.splitext(recordFilePath)
         bakFileName = tempFileName[0]+ "-"+getCurrentTime()+tempFileName[1]
         os.rename(recordFilePath,bakFileName)
 
-    with open(recordFilePath, "a") as f:
-        f.write(content)
-        f.write("\r\n")
+
 
 def RecordToDb(content):
     print("not support")

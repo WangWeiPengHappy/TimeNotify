@@ -1,3 +1,4 @@
+
 from asyncio.streams import start_server
 import tkinter
 from tkinter.constants import BOTTOM, CENTER, LEFT, RIGHT, TOP
@@ -23,6 +24,11 @@ def showInfo(title, content):
 
 def log(info):
     print(info)
+
+def getCurrentTimeWithYear():
+    now = datetime.datetime.now()
+    ts = now.strftime('%Y-%m-%d %H:%M:%S')
+    return ts
 
 def GetCurrentTime():
     now = datetime.datetime.now()
@@ -67,14 +73,14 @@ def UpdateTime():
 
     if(g_isStart and CountDown()):
         if(lableCountDownName.cget("text") == g_workString):
-            Record(entryItemContent.get(), RecordType.Record_File)
+            Record(getCurrentTimeWithYear()+ " "+ entryItemContent.get(), RecordType.Record_File)
             entryItemContent.config(state="normal")
             rest()
             lableCountDownName.config(text = g_restString)
             lableCountDownMin.config(text = g_restTimeMin)
             lableCountDownSec.config(text = g_restTimeSec)
         elif (lableCountDownName.cget("text") == g_restString):
-            Record("Rest", RecordType.Record_File)
+            #Record("Rest", RecordType.Record_File)
             work()
             entryItemContent.config(state="disabled")
             lableCountDownName.config(text = g_workString)
@@ -125,6 +131,7 @@ def HandleBtnEvent(btnText):
         lableCountDownName.config(text = g_workString)
         lableCountDownMin.config(text = g_workTimeMin)
         lableCountDownSec.config(text = g_workTimeSec)
+        entryItemContent.config(state="normal")
 
     else:
         print("The text is invalid: ", btnText)
