@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 #py2app config file
 setup.py
+record.txt
+record.db

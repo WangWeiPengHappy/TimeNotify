@@ -9,6 +9,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Timer
 from data import Record
 from data import RecordType
+from Util import Util
+import sys
 
 g_workString = "Work: "
 g_restString = "Rest: "
@@ -19,6 +21,47 @@ g_btnStart = "start"
 g_btnPause = "pause"
 g_btnStop = "stop"
 g_isStart = False
+class TaskInfo(object):
+    __startTime = ""
+    __endTime = ""
+    __TaskItem = ""
+    __workTimeMinStart=0
+    __workTimeSecStart=0
+    __workTimeMinEnd=0
+    __workTimeSecEnd=0
+    def __init__(self) -> None:
+        pass
+
+    def setStartTime(self, startTime:str)->None:
+        self.__startTime = startTime
+    
+    def setWorkTimeStart(self, minStart:int, secStart:int)->None:
+        self.__workTimeMinStart = minStart
+        self.__workTimeSecStart = secStart
+    
+    def setWorkTimeEnd(self, minEnd:int, secEnd:int)->None:
+        self.__workTimeMinEnd = minEnd
+        self.__workTimeSecEnd = secEnd
+
+    def setEndTime(self, endTime:str)->None:
+        self.__endTime = endTime
+    
+    def setTaskItem(self, taskItem:str)->None:
+        self.__TaskItem = taskItem
+    
+    def calcDuration(self)->int:
+        durationMin = self.__workTimeMinStart - self.__workTimeMinEnd
+        durationSec = self.__workTimeSecStart - self.__workTimeSecEnd
+        return durationMin*60+durationSec
+    
+    def getTaskInfo(self)->dict:
+        content = {}
+        content["item"] = self.__TaskItem
+        content["start"] = self.__startTime
+        content["end"] = self.__endTime
+        content["duration"] = self.calcDuration()
+        return content
+
 def showInfo(title, content):
     messagebox.showinfo(title, content, parent=main)#parent=main for messagebox is topmost
 
@@ -68,12 +111,19 @@ def BackgroundThread():
 
 def UpdateTime():
     global g_isStart
+    global g_taskInfo
+    global g_isDebugMod
     lableTime.config(text= datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     #print(entryItemContent.get())
 
     if(g_isStart and CountDown()):
         if(lableCountDownName.cget("text") == g_workString):
-            Record(getCurrentTimeWithYear()+ " "+ entryItemContent.get(), RecordType.Record_File)
+            #Record(getCurrentTimeWithYear()+ " "+ entryItemContent.get(), RecordType.Record_File)
+            g_taskInfo.setEndTime(getCurrentTimeWithYear())
+            print("End==>"+str(lableCountDownMin.cget("text"))+":"+str(lableCountDownSec.cget("text")))
+            g_taskInfo.setWorkTimeEnd(lableCountDownMin.cget("text"), lableCountDownSec.cget("text"))
+            recordType = RecordType.Record_None if g_isDebugMod else RecordType.Record_Db
+            Record(g_taskInfo.getTaskInfo(), recordType)
             entryItemContent.config(state="normal")
             rest()
             lableCountDownName.config(text = g_restString)
@@ -86,14 +136,18 @@ def UpdateTime():
             lableCountDownName.config(text = g_workString)
             lableCountDownMin.config(text = g_workTimeMin)
             lableCountDownSec.config(text = g_workTimeSec)
+            g_taskInfo.setTaskItem(entryItemContent.get())
+            g_taskInfo.setStartTime(getCurrentTimeWithYear())
+            print("start==>"+str(lableCountDownMin.cget("text"))+":"+str(lableCountDownSec.cget("text")))
+            g_taskInfo.setWorkTimeStart(lableCountDownMin.cget("text"), lableCountDownSec.cget("text"))
         else:
             log("lableCountDownName is invalid.")
             return
     lableTime.after(1000, UpdateTime)
 
 def CountDown():
-    min = int(lableCountDownMin.cget("text"))
-    sec = int(lableCountDownSec.cget("text"))
+    min = lableCountDownMin.cget("text")
+    sec = lableCountDownSec.cget("text")
     if (sec!=0):
         sec -= 1
     elif (min != 0):
@@ -111,6 +165,8 @@ def CountDown():
 
 def HandleBtnEvent(btnText):
     global g_isStart
+    global g_taskInfo
+    global g_isDebugMod
     if(btnText == g_btnStart):
         #start
         if(len(entryItemContent.get()) == 0):
@@ -119,6 +175,10 @@ def HandleBtnEvent(btnText):
         entryItemContent.config(state="disable")
         BtnStart.config(text=g_btnPause)   
         g_isStart = True
+        g_taskInfo.setTaskItem(entryItemContent.get())
+        g_taskInfo.setStartTime(getCurrentTimeWithYear())
+        g_taskInfo.setWorkTimeStart(int(lableCountDownMin.cget("text")), int(lableCountDownSec.cget("text")))
+
     elif(btnText == g_btnPause):
         #pause
         g_isStart = False
@@ -126,6 +186,11 @@ def HandleBtnEvent(btnText):
         entryItemContent.config(state="normal")
     elif(btnText == g_btnStop):
         #stop
+        if g_isStart and lableCountDownName.cget("text") == g_workString:
+            g_taskInfo.setEndTime(getCurrentTimeWithYear())
+            g_taskInfo.setWorkTimeEnd(int(lableCountDownMin.cget("text")), int(lableCountDownSec.cget("text")))
+            recordType = RecordType.Record_None if g_isDebugMod else RecordType.Record_Db
+            Record(g_taskInfo.getTaskInfo(), recordType)
         g_isStart = False
         BtnStart.config(text=g_btnStart)
         lableCountDownName.config(text = g_workString)
@@ -137,13 +202,23 @@ def HandleBtnEvent(btnText):
         print("The text is invalid: ", btnText)
     return
 
+if len(sys.argv) > 1:
+    if str(sys.argv[1]) == "debug":
+        Util.enableDebugMode()
+
 main = tkinter.Tk()
 main.title("ComeOnGuys")
 #set windows on top most
 main.wm_attributes("-topmost", 1) 
 #it will pop windows when click the icon on docker
 main.createcommand('tk::mac::ReopenApplication', main.deiconify)
-
+#Debug mod
+global g_isDebugMod
+g_isDebugMod = Util.isDebugMod()
+if g_isDebugMod:
+    g_workTimeMin = 0#54
+    g_restTimeMin = 0#4
+    g_workTimeSec = g_restTimeSec = 5#59
 #窗口布局
 framePlaceholderTop = Frame(main)
 framePlaceholderTop.config(height= int(0.25* main.winfo_height()))
@@ -182,6 +257,8 @@ lableTime.pack(side=LEFT, anchor="w")
 # framePlaceholderBottom = Frame(main)
 # framePlaceholderBottom.config(height= int(0.25* main.winfo_height()))
 # framePlaceholderBottom.pack(side=BOTTOM, anchor="w")
+global g_taskInfo 
+g_taskInfo = TaskInfo()
 UpdateTime()
 
 
