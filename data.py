@@ -117,7 +117,7 @@ class DbRecorder(Recorder):
 
     def __init__(self) -> None:
         super().__init__()
-        self.__dbPath = self.__timerFloder + self.__dbName
+        self.__dbPath = self.timerFloder + self.__dbName
         if Util.isDebugMod():
             self.__dbPath = self.__dbName
         dbConnect = sqlite3.connect(self.__dbPath)
